@@ -5,25 +5,40 @@ class MovieList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pageNum: props.route.params.pageNum
+            loading: true,
+            pageNum: props.route.params.pageNum,
+            movies: []
         }
     }
 
-    handleLoadMore = () => {
-        console.log(this.props.route.params)
-        this.props.route.params.updatePage();
-        fetch('http://www.omdbapi.com/?apikey=ccef0e&page='+ this. props.route.params.pageNum +'&s=' + this.props.route.params.movieName)
+    componentDidMount() {
+        this.fetchData(1);
+    }
+
+    fetchData = (page) => {
+        fetch('http://www.omdbapi.com/?apikey=ccef0e&page='+ page +'&s=' + this.props.route.params.movieName)
             .then(response => response.json())
             .then(responseJson => {
-                this.props.navigation.navigate('MovieList', {movies: responseJson.Search});
+                this.setState({
+                    loading: false,
+                    movies: responseJson.Search
+                })
             })
             .catch(error => {
                 console.error(error);
             });
     }
 
+    handleLoadMore = () => {
+        this.props.route.params.updatePage(this.props.route.params.pageNum++)
+        this.fetchData(this.props.route.params.pageNum)
+    }
+
     render() {
-        const data = this.props.route.params.movies;
+        if (this.state.loading) {
+            return <Text>Loading..</Text>;
+        }
+        const data = this.state.movies;
         console.log(this.props)
         console.log(data);
         return (
@@ -32,7 +47,7 @@ class MovieList extends Component {
                     data={data}
                     renderItem={({item}) => <Item title={item.Title} src={item.Poster} year={item.Year} />}
                     onEndReached={this.handleLoadMore}
-                    onEndReachedThreshold={0.5}
+                    onEndReachedThreshold={2}
                     keyExtractor={item => item.imdbID}
                 />
             </SafeAreaView>

@@ -20,18 +20,11 @@ class Inputs extends Component {
         this.setState({ movieName: text })
     }
     search = (movieName) => {
-        fetch('http://www.omdbapi.com/?apikey=ccef0e&page='+this.state.pageNum+'&s=' + movieName)
-            .then(response => response.json())
-            .then(responseJson => {
-                this.props.navigation.navigate('MovieList', {movies: responseJson.Search,
-                    movieName: movieName,
-                    updatePage: this.updatePage,
-                    pageNum: this.state.pageNum
-                });
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        this.props.navigation.navigate('MovieList', {
+            movieName: movieName,
+            updatePage: this.updatePage,
+            pageNum: this.state.pageNum
+        });
     }
     render() {
         return (
