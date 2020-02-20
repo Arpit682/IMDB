@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, FlatList, SafeAreaView, StyleSheet, Image } from 'react-native'
+import {View, Text, FlatList, SafeAreaView, StyleSheet, Image, TouchableWithoutFeedback} from 'react-native'
 
 class MovieList extends Component {
     constructor(props) {
@@ -39,13 +39,11 @@ class MovieList extends Component {
             return <Text>Loading..</Text>;
         }
         const data = this.state.movies;
-        console.log(this.props)
-        console.log(data);
         return (
             <SafeAreaView style={styles.container}>
                 <FlatList
                     data={data}
-                    renderItem={({item}) => <Item title={item.Title} src={item.Poster} year={item.Year} />}
+                    renderItem={({item}) => <Item title={item.Title} src={item.Poster} year={item.Year} item={item}/>}
                     onEndReached={this.handleLoadMore}
                     onEndReachedThreshold={2}
                     keyExtractor={item => item.imdbID}
@@ -55,14 +53,19 @@ class MovieList extends Component {
     }
 }
 
-function Item({ title, src, year }) {
+ const Item = ({ title, src, year, item }) => {
     return (
+        <TouchableWithoutFeedback onPress={ () =>         this.props.route.params.navigation.navigate('MoviePage', {
+            item: item
+        })
+        }>
             <View style={{ width: 200, height: 100 , flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Image source={{uri: src}} style={{width: 50, height: 50}}/>
                 <Text>{title}</Text>
                 <Text>Rating: NA</Text>
                 <Text>Year: {year}</Text>
             </View>
+        </TouchableWithoutFeedback>
     );
 }
 
